@@ -1,0 +1,301 @@
+import pygame
+import random
+
+font_name = pygame.font.match_font('arial')
+
+def draw_text(surf, text, size, x, y):
+    font = pygame.font.Font(font_name, size)
+    text_surface = font.render(text, True, (254, 231, 240))
+    text_rect = text_surface.get_rect()
+    text_rect.midtop = (x, y)
+    surf.blit(text_surface, text_rect)
+
+from pygame.constants import K_RCTRL, K_r
+
+pygame.init()
+#pygame.mixer.init()
+screen = pygame.display.set_mode((1700, 600))
+pygame.display.set_caption("Flappy Bird")
+
+
+x = 50; y = 50; width = 30; height = 30; V = 5; a = 0.45; alive = True; counter = 0; player2 = True; y2 = 50; V2 = 5; x2 = 1650; counter2 = 0
+el_left = False; el_right = False; enc_count = 0; el_x = 800; el_y = 300; el_p1 = True; el_p2 = True
+fb_left = False; fb_right = False; fb_unc_l = 0; fb_unc_r = 0; fb_x = 800; fb_y = 300
+drive_x = 0; drive_y = 0; drive_left = False; drive_right = False; drive_left_counter = 0; drive_right_counter = 0
+
+tubes = [[random.randint(1,3),600],[random.randint(1,3),1000]]
+tubes2 = [[random.randint(1,3),1100],[random.randint(1,3),700]]
+
+run = True
+
+while run == True:
+    pygame.time.delay(25)
+
+    
+
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            run = False
+
+
+    keys = pygame.key.get_pressed()
+    if keys[pygame.K_SPACE]:
+        V -= 3.5 
+
+    if keys[pygame.K_UP]:
+        V2 -= 3.5 
+
+    if keys[K_r]:
+        el_left = False; el_right = False; enc_count = 0; el_x = 800; el_y = 300; el_p1 = True; el_p2 = True
+        y = 50
+        y2 = 60
+        alive = True
+        player2 = True
+        tubes = [[random.randint(1,3),600],[random.randint(1,3),1000]]
+        tubes2 = [[random.randint(1,3),1100],[random.randint(1,3),700]]
+        counter = 0; counter2 = 0
+        fb_left = False; fb_right = False; fb_unc_l = 0; fb_unc_r = 0; fb_x = 800; fb_y = 300
+        drive_x = 0; drive_y = 0; drive_left = False; drive_right = False; drive_left_counter = 0; drive_right_counter = 0
+        #print("+")
+    
+    V += a
+    y += V
+
+    V2 += a
+    y2 += V2
+
+    if V <= -10:
+        V = -10
+    if V >= 10:
+        V = 10
+
+    if y < 0:
+        y = 0
+    
+    if y > 600:
+        y = 600
+
+    if V2 <= -10:
+        V2 = -10
+    if V2 >= 10:
+        V2 = 10
+
+
+
+    #death
+    if y <= 0 or y >= 600:
+        alive = bool(0 + int(el_p1))
+        if el_p1 == True:
+            y = 300
+            el_p1 = False
+    if tubes[0][0] == 1 and tubes[0][1] >= 50 and tubes[0][1] <= 80 and (y < 60 or y > 300):
+        alive = bool(0 + int(el_p1))
+        if el_p1 == True:
+            tubes[0][1] -= 60; tubes[1][1] -= 60
+            el_p1 = False
+    if tubes[0][0] == 2 and tubes[0][1] >= 50 and tubes[0][1] <= 80 and (y < 180 or y > 420):
+        alive = bool(0 + int(el_p1))
+        if el_p1 == True:
+            tubes[0][1] -= 60; tubes[1][1] -= 60
+            el_p1 = False
+    if tubes[0][0] == 3 and tubes[0][1] >= 50 and tubes[0][1] <= 80 and (y < 300 or y > 540):
+        alive = bool(0 + int(el_p1))
+        if el_p1 == True:
+            tubes[0][1] -= 60; tubes[1][1] -= 60
+            el_p1 = False
+
+    #death2
+    if y2 <= 0 or y2 >= 600:
+        player2 = bool(0 + int(el_p2))
+        if el_p2 == True:
+            y2 = 300
+            el_p2 = False
+    if tubes2[0][0] == 1 and tubes2[0][1] >= 1620 and tubes2[0][1] <= 1650 and (y2 < 60 or y2 > 300):
+        player2 = bool(0 + int(el_p2))
+        if el_p2 == True:
+            tubes2[0][1] += 60; tubes2[1][1] += 60
+            el_p2 = False
+    if tubes2[0][0] == 2 and tubes2[0][1] >= 1620 and tubes2[0][1] <= 1650 and (y2 < 180 or y2 > 420):
+        player2 = bool(0 + int(el_p2))
+        if el_p2 == True:
+            tubes2[0][1] += 60; tubes2[1][1] += 60
+            el_p2 = False
+    if tubes2[0][0] == 3 and tubes2[0][1] >= 1620 and tubes2[0][1] <= 1650 and (y2 < 300 or y2 > 540):
+        player2 = bool(0 + int(el_p2))
+        if el_p2 == True:
+            tubes2[0][1] += 60; tubes2[1][1] += 60
+            el_p2 = False
+
+
+    screen.fill((0,0,0))
+
+    for i in range(len(tubes)):
+        if alive == True:
+            tubes[i][1] -= 5 + bool(drive_left_counter) * 55
+        if tubes[i][0] == 1:
+            pygame.draw.rect(screen, (0,255,0), (tubes[i][1], 0, 50, 60))
+            pygame.draw.rect(screen, (0,255,0), (tubes[i][1], 300, 50, 300))
+        if tubes[i][0] == 2:
+            pygame.draw.rect(screen, (0,255,0), (tubes[i][1], 0, 50, 180))
+            pygame.draw.rect(screen, (0,255,0), (tubes[i][1], 420, 50, 180))
+        if tubes[i][0] == 3:
+            pygame.draw.rect(screen, (0,255,0), (tubes[i][1],0, 50, 300))
+            pygame.draw.rect(screen, (0,255,0), (tubes[i][1],540, 50, 60))
+
+    for i in range(len(tubes2)):
+        if player2 == True:
+            tubes2[i][1] += 5 + bool(drive_right_counter) * 55
+        if tubes2[i][0] == 1:
+            pygame.draw.rect(screen, (255,0,0), (tubes2[i][1], 0, 50, 60))
+            pygame.draw.rect(screen, (255,0,0), (tubes2[i][1], 300, 50, 300))
+        if tubes2[i][0] == 2:
+            pygame.draw.rect(screen, (255,0,0), (tubes2[i][1], 0, 50, 180))
+            pygame.draw.rect(screen, (255,0,0), (tubes2[i][1], 420, 50, 180))
+        if tubes2[i][0] == 3:
+            pygame.draw.rect(screen, (255,0,0), (tubes2[i][1],0, 50, 300))
+            pygame.draw.rect(screen, (255,0,0), (tubes2[i][1],540, 50, 60))
+
+    if tubes[0][1] <= 0:
+        counter += 1
+        #print(counter)
+        tubes = [tubes[1], [random.randint(1,3), 800]]
+
+    if tubes2[0][1] >= 1700:
+        counter2 += 1
+        #print(counter)
+        tubes2 = [tubes2[1], [random.randint(1,3), 900]]
+
+    
+    if player2 == True:
+        pygame.draw.rect(screen, (0,255,int(el_p2) * 200), (x2,y2,width,height))
+    #else:
+        #pygame.draw.rect(screen, (255,255,255), (1670,570,width,height))
+
+    if alive == True:
+        pygame.draw.rect(screen, (255,0,int(el_p1) * 200), (x,y,width,height))
+    #else:
+        #print("YOU ACHIVE " + str(counter) + " score!")
+        #counter = 0
+        #pygame.draw.rect(screen, (255,255,255), (0,570,width,height))
+
+    draw_text(screen, str(counter), 50, 75, 15)
+
+    draw_text(screen, str(counter2), 50, 1615, 15)
+
+    pygame.draw.rect(screen, (120,125,230), (845,0,10,600))
+
+    enc_count += 1
+
+    if enc_count == 100:
+        enc_count = 0
+        ex_event = random.randint(1,6)
+        if ex_event == 1:
+            el_left = True
+            el_right = False
+            el_x = 800
+            el_y = random.randint(100,500)
+        elif ex_event == 2:
+            el_right = True
+            el_left = False
+            el_x = 900
+            el_y = random.randint(100,500)
+        elif ex_event == 3:
+            fb_left = True
+            fb_right = False
+            fb_x = 800
+            fb_y = random.randint(100,500)
+        elif ex_event == 4:
+            fb_right = True
+            fb_left = False
+            fb_x = 900
+            fb_y = random.randint(100,500)
+        elif ex_event == 5:
+            drive_left = True
+            drive_right = False
+            drive_x = 800
+            drive_y = random.randint(100,500)
+        elif ex_event == 6:
+            drive_left = False
+            drive_right = True
+            drive_x = 900
+            drive_y = random.randint(100,500)
+
+    if drive_left == True:
+        pygame.draw.rect(screen, (225,149,151), (drive_x, drive_y, 50, 50))
+        drive_x-=10
+        drive_y += random.randint(-5,5)
+    if drive_right == True:
+        pygame.draw.rect(screen, (225,149,151), (drive_x, drive_y, 50, 50))
+        drive_x+=10
+        drive_y += random.randint(-5,5)
+
+    if fb_left == True:
+        pygame.draw.rect(screen, (255,255,255), (fb_x, fb_y, 50, 50))
+        fb_x-=10
+        fb_y += random.randint(-5,5)
+
+    if fb_right == True:
+        pygame.draw.rect(screen, (255,255,255), (fb_x, fb_y, 50, 50))
+        fb_x+=10
+        fb_y += random.randint(-5,5)
+
+    if el_left == True:
+        pygame.draw.rect(screen, (0,0,255), (el_x, el_y, 50, 50))
+        el_x -= 10
+        el_y += random.randint(-5,5)
+    
+    if el_right == True:
+        pygame.draw.rect(screen, (0,0,255), (el_x, el_y, 50, 50))
+        el_x += 10
+        el_y += random.randint(-5,5)
+
+    if abs(x - drive_x) < 30 and abs(y - drive_y) < 50:
+        drive_left = False; drive_left_counter = 50
+
+    if abs(x2 - drive_x) < 30 and abs(y2 - drive_y) < 50:
+        drive_right = False; drive_right_counter = 50
+
+    if abs(x - el_x) < 30 and abs(y - el_y) < 50:
+        if el_p1 == True:
+            counter += 1
+        el_left = False
+        el_x = -1000
+        el_p1 = True
+
+    if abs(x2 - el_x) < 30 and abs(y2 - el_y) < 50:
+        if el_p2 == True:
+            counter2 += 1
+        el_right = False
+        el_x = -1000
+        el_p2 = True
+
+    if abs(x - fb_x) < 30 and abs(y - fb_y) < 50:
+        fb_left = False; fb_unc_r = 50
+
+    if abs(x2 - fb_x) < 30 and abs(y2 - fb_y) < 50:
+        fb_right = False; fb_unc_l = 50
+
+    if fb_unc_r > 0:
+        pygame.draw.rect(screen, (255,0,0), (1000, 0, 700, 600))
+        fb_unc_r -= 7
+
+    if fb_unc_l > 0:
+        pygame.draw.rect(screen, (255,0,0), (0, 0, 700, 600))
+        fb_unc_l -= 7
+
+    
+    if drive_left_counter > 0:
+        alive = True
+        drive_left_counter -= 5
+
+    if drive_right_counter > 0:
+        player2 = True
+        drive_right_counter -= 5
+
+
+    
+
+    pygame.display.update()
+
+
+pygame.QUIT()
